@@ -1,0 +1,8 @@
+future==0.18.0
+geoplotlib==0.3.2
+numpy==1.17.2
+pandas==0.25.1
+pyglet==1.4.5
+python-dateutil==2.8.0
+pytz==2019.3
+six==1.12.0
