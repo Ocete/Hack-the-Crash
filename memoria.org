@@ -21,10 +21,10 @@ During this challenge we used both Python processing with Pandas and KNIME. With
 After this we really dived into the data. On one hand we developed a geographic study. By displaying the latitude and longitude attributes over a world map we discovered a lot of invalid instances. The map also shows a South focused distribution, where the population aglomerates.
  
 #+CAPTION: Caption
-[[./merged.png]]
+[[./images/merged.png]]
 \FloatBarrier
 #+CAPTION: Caption
-[[./map1.png]]
+[[./images/map1.png]]
 \FloatBarrier
 
 On this study is also worth mentioning the number of variables that contains geographic information. Here we include =Latitute=, =Longitude=, =Location Easting OSGR=, =Location Northing OSGR=, =Local Authority (District)=, =Local Authority (Highway Authority - ONS code)= and =Police Force=. In fact, =Police Force= is the one that best summarizes this information since it describes the police force in charge of the area where the accident took place, dividing UK in districts. This reasoning was confirmed afterwards by the Random Forest algorithm, which is explained in the section COMPLETAR.
@@ -33,16 +33,18 @@ On this study is also worth mentioning the number of variables that contains geo
 On the other hand we applied statistics methods to distinguish which variables are really meaninful. By fixing a variable and value, we look at the percentage of severe accidents which happens when ~variable = value~. For example:
 
 #+CAPTION: Caption
-|-----------+-------+----------+----------|
-| Day       | count |  p. slight | p. serious |
-|-----------+-------+----------+----------|
-| Monday    | 19343 | 0.835910 | 0.164090 |
-| Sunday    | 16632 | 0.813312 | 0.186688 |
-| Saturday  | 17750 | 0.817803 | 0.182197 |
-| Wednesday | 20082 | 0.828155 | 0.171845 |
-| Friday    | 21348 | 0.828602 | 0.171398 |
-| Tuesday   | 19796 | 0.832239 | 0.167761 |
-| Thursday  | 20800 | 0.833125 | 0.166875 |
+|-----------+-------+-----------+------------|
+| Day       | count | p. slight | p. serious |
+|-----------+-------+-----------+------------|
+| Monday    | 19343 |  0.835910 |   0.164090 |
+| Sunday    | 16632 |  0.813312 |   0.186688 |
+| Saturday  | 17750 |  0.817803 |   0.182197 |
+| Wednesday | 20082 |  0.828155 |   0.171845 |
+| Friday    | 21348 |  0.828602 |   0.171398 |
+| Tuesday   | 19796 |  0.832239 |   0.167761 |
+| Thursday  | 20800 |  0.833125 |   0.166875 |
+|-----------+-------+-----------+------------|
+
 \FloatBarrier
 * Preprocessing strategies
 
