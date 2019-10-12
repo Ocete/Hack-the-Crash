@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from imblearn import under_sampling
 
 from sklearn import (
     metrics,
@@ -162,13 +163,14 @@ y = dataset['target']
 
 skf = model_selection.StratifiedKFold(n_splits=5)
 
-# classifier = ensemble.RandomForestClassifier(
-#     n_estimators=100, max_depth=10, class_weight='balanced'
-# )
+classifier = ensemble.RandomForestClassifier(
+    n_estimators=100, max_depth=10, class_weight='balanced'
+)
 
 split_indices = skf.split(x, y)
 scores = []
 f1_scores = []
+confusion_matrices = []
 
 for train_index, test_index in split_indices:
     print("New split")
@@ -183,8 +185,11 @@ for train_index, test_index in split_indices:
 
     labels_pred = classifier.predict(test_set)
     curr_score = metrics.accuracy_score(test_labels, labels_pred)
-    curr_f1 = metrics.f1_score(test_labels, labels_pred, average='macro')
+    curr_f1 = metrics.f1_score(test_labels, labels_pred, average='binary')
+    conf_matrix = metrics.confusion_matrix(test_labels, labels_pred)
     print("Acc: {}, F1: {}".format(curr_score, curr_f1))
+    print("Confusion matrix")
+    print(conf_matrix)
     scores.append(curr_score)
     f1_scores.append(curr_f1)
 
