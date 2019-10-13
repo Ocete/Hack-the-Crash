@@ -51,17 +51,18 @@ dataset_accidents = dataset_accidents.drop(
 dataset_accidents['weekday'] = pd.to_datetime(
     dataset_accidents['date']
 ).dt.weekday_name
+dataset_accidents['weekend'] = (dataset_accidents['weekday'].isin(
+    ['Friday', 'Saturday', 'Sunday']
+))*1
 dataset_accidents['day_period'] = pd.to_datetime(
     dataset_accidents['time']
 ).dt.hour
 dataset_accidents['day_period'] = pd.cut(
-    dataset_accidents['day_period'], bins=[0, 8, 14, 18, 24], right=False
+    dataset_accidents['day_period'], bins=[0, 7, 9, 13, 16, 20, 24], right=False
 )
-
-dataset_accidents = dataset_accidents.drop(['date', 'time'], axis=1)
+dataset_accidents = dataset_accidents.drop(['date', 'time', 'weekday'], axis=1)
 
 # Variables with too much invalid or non computed values
-
 dataset_accidents = dataset_accidents.drop(
     [
         'pedestrian_crossing-human_control',
@@ -105,16 +106,9 @@ dataset = dataset.drop(['Was_Vehicle_Left_Hand_Drive?'], axis=1)
 
 
 # Almost every vehicle is not articulated
-dataset = dataset.drop(
-    'Towing_and_Articulation',
-    axis=1
-)
-
-# Difficult to influence in this variable
-dataset = dataset.drop(
-    'Vehicle_Manoeuvre',
-    axis=1
-)
+dataset['Towing_and_Articulation'] = (~dataset['Towing_and_Articulation'].isin(
+    ['-1', 'No tow/articulation']
+))
 
 # Deleting this variable because almost every value is none
 dataset = dataset.drop('Hit_Object_in_Carriageway', axis=1)
@@ -138,9 +132,12 @@ dataset = dataset.drop('Journey_Purpose_of_Driver', axis=1)
 # Junction_Location collides with another column from accidents. Deleting
 dataset = dataset.drop('Junction_Location', axis=1)
 
+dataset['Skidding_and_Overturning'] = dataset[
+    dataset['Skidding_and_Overturning'].isin(['-1', 'None'])
+]
+
 # MISSING DATA HANDLING
 # Missing values for categorical data are replaced with the mode of the variable (common point imputation)
-dataset.loc[dataset['Propulsion_Code'] == '-1', 'Propulsion_Code'] = dataset['Propulsion_Code'].mode()
 dataset.loc[dataset['Vehicle_Type'] == '-1', 'Vehicle_Type'] = dataset['Vehicle_Type'].mode()
 
 dataset.loc[
@@ -148,15 +145,19 @@ dataset.loc[
 ] = dataset['Vehicle_Location-Restricted_Lane'].mode()
 
 dataset.loc[
-    dataset['Skidding_and_Overturning'] == '-1', 'Skidding_and_Overturning'
-] = dataset['Skidding_and_Overturning'].mode()
-
-dataset.loc[
     dataset['Hit_Object_off_Carriageway'] == '-1', 'Hit_Object_off_Carriageway'
 ] = dataset['Hit_Object_off_Carriageway'].mode()
 
+# Dataset permutation and obtention of remaining onehot variables
+dataset = dataset.sample(frac=1, random_state=42)
 dataset = pd.get_dummies(dataset)
-dataset = dataset.sample(frac=1)
+dataset = pd.get_dummies(
+    dataset,
+    columns=['road_type', 'weather_conditions']
+)
+
+# Deletion of columns relative to -1
+dataset = dataset[dataset.columns.drop(list(dataset.filter(regex='-1')))]
 
 x = dataset.drop('target', axis=1)
 y = dataset['target']
@@ -164,7 +165,7 @@ y = dataset['target']
 skf = model_selection.StratifiedKFold(n_splits=5)
 
 classifier = ensemble.RandomForestClassifier(
-    n_estimators=100, max_depth=10, class_weight='balanced'
+    n_estimators=200, max_depth=50, class_weight='balanced'
 )
 
 split_indices = skf.split(x, y)
@@ -180,10 +181,11 @@ for train_index, test_index in split_indices:
 
     train_set, train_labels = x.loc[train_index], y[train_index]
     test_set, test_labels = x.loc[test_index], y[test_index]
-
+    train_set, train_labels = rus.fit_resample(train_set, train_labels)
     classifier.fit(train_set, train_labels)
 
     labels_pred = classifier.predict(test_set)
+
     curr_score = metrics.accuracy_score(test_labels, labels_pred)
     curr_f1 = metrics.f1_score(test_labels, labels_pred, average='binary')
     conf_matrix = metrics.confusion_matrix(test_labels, labels_pred)
