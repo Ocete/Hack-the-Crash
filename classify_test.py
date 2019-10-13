@@ -142,7 +142,7 @@ dataset_test['urban_area'] = 1*(
 
 dataset_test.drop(dropped_cols_intermediate, axis=1, inplace=True)
 
-dataset_test = dataset_test.merge(dataset_vehicles, on='accident_id')
+dataset_test = dataset_test.merge(dataset_vehicles, how='left', on='accident_id')
 
 dataset_ids = dataset_test['accident_id']
 dataset_test = dataset_test.drop('accident_id', axis=1)
@@ -177,6 +177,8 @@ for col in missing_cols:
 
 dataset_test = dataset_test[x.columns]
 
+dataset_test[dataset_test.isna()] = 0
+
 predictions = classifier.predict(dataset_test)
 
 predictions_df = pd.DataFrame(
@@ -185,3 +187,4 @@ predictions_df = pd.DataFrame(
 
 final_preds = predictions_df.groupby('id').mean()
 final_preds = final_preds.astype(int).reindex(dataset_ids.unique())
+print(final_preds)
