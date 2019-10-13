@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from imblearn import under_sampling
 
 from sklearn import (
     metrics,
@@ -51,15 +50,19 @@ dataset_accidents = dataset_accidents.drop(
 dataset_accidents['weekday'] = pd.to_datetime(
     dataset_accidents['date']
 ).dt.weekday_name
+
 dataset_accidents['weekend'] = (dataset_accidents['weekday'].isin(
     ['Friday', 'Saturday', 'Sunday']
 ))*1
+
 dataset_accidents['day_period'] = pd.to_datetime(
     dataset_accidents['time']
 ).dt.hour
+
 dataset_accidents['day_period'] = pd.cut(
     dataset_accidents['day_period'], bins=[0, 7, 9, 13, 16, 20, 24], right=False
 )
+
 dataset_accidents = dataset_accidents.drop(['date', 'time', 'weekday'], axis=1)
 
 # Variables with too much invalid or non computed values
@@ -148,8 +151,7 @@ dataset.loc[
     dataset['Hit_Object_off_Carriageway'] == '-1', 'Hit_Object_off_Carriageway'
 ] = dataset['Hit_Object_off_Carriageway'].mode()
 
-# Dataset permutation and obtention of remaining onehot variables
-dataset = dataset.sample(frac=1, random_state=42)
+# Obtention of remaining onehot variables
 dataset = pd.get_dummies(dataset)
 dataset = pd.get_dummies(
     dataset,
@@ -159,13 +161,16 @@ dataset = pd.get_dummies(
 # Deletion of columns relative to -1
 dataset = dataset[dataset.columns.drop(list(dataset.filter(regex='-1')))]
 
+# Dataset permutation
+dataset = dataset.sample(frac=1, random_state=42)
+
 x = dataset.drop('target', axis=1)
 y = dataset['target']
 
 skf = model_selection.StratifiedKFold(n_splits=5)
 
 classifier = ensemble.RandomForestClassifier(
-    n_estimators=200, max_depth=50, class_weight='balanced'
+    n_estimators=100, max_depth=20, class_weight='balanced'
 )
 
 split_indices = skf.split(x, y)
@@ -181,7 +186,7 @@ for train_index, test_index in split_indices:
 
     train_set, train_labels = x.loc[train_index], y[train_index]
     test_set, test_labels = x.loc[test_index], y[test_index]
-    train_set, train_labels = rus.fit_resample(train_set, train_labels)
+
     classifier.fit(train_set, train_labels)
 
     labels_pred = classifier.predict(test_set)
