@@ -10,14 +10,14 @@
 
 In this document we discuss our approach to the McKinsey&Company challenge in HackUPC 2019. In this challenge we try to predict the severity of car crashes in UK from a given data set.
 
-Our initial attempts consisted in running some basic ML algorithms that did not work out due to the data size and complexity, as expected. We invested a few hours in studying the problem. After applying some preprocessing to the data we run a Random Forest algorithm to predict variable relevance.
+Our initial attempts consisted in running some basic ML algorithms that did not work out due to the data's size and complexity, as expected. We invested a few hours in studying the problem. After applying some preprocessing to the data we ran a Random Forest algorithm to predict variable relevance.
 With this knowledge we used other ML algorithms to obtain our final results.
 
 * Initial analysis
 
-During this challenge we used both Python processing with Pandas and KNIME. With the latter, we started by running *C4.5* and *Random Forest* algorithms since decisions trees are models from which you can extract information. We obtained =F1-scores= for each class instead of a global one. This showed a fairly good =F1-score= for the non-severe accidents class (around ~0.8~) and a critically low one (around ~0.01~) for the severe accidents class, the one we are trying to predict. Because of this we realized that the class was completely imbalanced: Only ~17.15%~ of our dataset were severe accidents.
+During this challenge we used both Python processing with Pandas and KNIME. With the latter, we started by running *C4.5* and *Random Forest* algorithms, since decisions trees are models from which you can extract information. We obtained =F1-scores= for each class instead of a global one. This showed a fairly good =F1-score= for the non-severe accidents class (around ~0.8~) and a critically low one (around ~0.01~) for the severe accidents class, the one we are trying to predict. Because of this we realized that the class was completely imbalanced: only ~17.15%~ of our dataset were severe accidents.
 
-After this we really dived into the data to gain problem knowledge. On one hand we developed a geographic study. By displaying the latitude and longitude attributes over a world map we discovered a lot of invalid instances. The map also shows a South focused distribution, where the population agglomerates.
+After this we really dived into the data to gain problem knowledge. First, we developed a geographic study. By displaying the latitude and longitude attributes over a world map we discovered a lot of invalid instances. The map also shows a South focused distribution, where the population agglomerates.
 
 #+CAPTION: Heatmaps of accidents and population in UK
 [[./images/merged.png]]
@@ -44,9 +44,9 @@ were added in order to potentially help us obtain valuable information from the
 other variables. These were =Weekday= and =Day period=.
 
 In order to find dependencies between variables we studied marginal conditional
-probability between them. These shows huge correlations between the geolocation
+probability between them. These show huge correlations between the geolocation
 variable mentioned above, and within some others. By re-running the
-*Random Forest* algorithm with selected =Police Force= as the most informative
+*Random Forest* algorithm, we selected =Police Force= as the most informative
 variable between them. We filtered the rest of them and run the algorithm again
  with the same result, assuming our choice was correct.
 
@@ -57,7 +57,7 @@ that give the most insight. We explain here some of them:
 
   =pedestrian_crossing-human_control=, =pedestrian_crossing-physical_facilities= and =carriageway_hazards=.
 - Converted variables into booleans, such as =Urban or rural=.
-- Filtered roads numbers since road classes give more information.
+- Filtered roads numbers, since road classes give more information.
 - Deleted the sex of the driver on purpose since we prefer not to take this
   information into account.
 - Transformed other numeric variables into categorical ones, since the number
@@ -71,7 +71,7 @@ that give the most insight. We explain here some of them:
   since the domain of this attributes changed from the training dataset to the
   test, meaning that we couldn't train we those values.
 
-Another mayor problem we encountered was the missing or bad data. To fight this
+Another major problem we encountered was the missing or bad data. To fight this
 issue we took three different approaches, depending on the data characteristics
 and instances:
 
@@ -99,15 +99,15 @@ dataset:
 
 * Solution: The Builder
 
-The first to take into account when trying to provide solutions to this problem is
+The first thing to take into account when trying to provide solutions to this problem is
 that not all of our attributes can be easily influenced. For example, the age of
-the driver involved or the precise maneuver uver they were doing. We present here an
+the driver involved or the precise maneuver they were doing. We present here an
 actionable plan that focused on the ones within reach.
 
 By looking into the data we are quite concerned about the severity of the
 accidents that happen within metropolitan areas involving either motorbikes or
-bicycles. In particular, ~30.23%~ of accidents involving two wheels means of
-transport are severe and ~16%~ of the accidents took place only in the City of
+bicycles. In particular, ~30.23%~ of accidents involving two-wheelers
+are severe and ~16%~ of the accidents took place only in the City of
 London.
 
 Our plan consists on developing two services:
@@ -122,9 +122,9 @@ Once the Builder creates a network, a new dataset of fake accident data is built
 for that network. Our trained model predicts the severity of those accidents and
 compares them to the real one.
 
-With this approach we provide a tool that given accident data creates new road
+With this approach we provide a tool that, given accident data, creates new road
 networks reducing the severity of the its accidents. This would work for any
-dataset given, not only for UK.
+dataset given, not only for the UK.
 
 In terms of impact, building this system would be really expensive for arbitrary
 road networks. In order to minimize that cost we could take into account the
@@ -133,9 +133,9 @@ current network system to change within a given budget.
 * Other possible solutions
 
 Using this dataset we could consider other studies that would also reduce the
-accident severity. However, we didn't have the time to look at this in deep.
+accident severity. However, we didn't have the time to look at this in depth.
 Some of these are studying how impacts with other objects affect severity in
-order to change them or the first point of impact in a car, to improve car
+order to change them or the first point of impact in a car or to improve car
 resistance.
 
 * Personal takeaways
@@ -144,6 +144,6 @@ Although we had previously worked on data prediction, this challenge felt like
 the first real world experience for us. At the beginning we were quite stuck,
 our initial attempts didn't work at all and the information we obtained didn't
  feel really useful. However, after we started using some common sense and applied
-  less usual techniques  the data started to unfold. These are precisely our takeaways from this challenge: the different approaches we took upon getting stuck as well as how common knowledge can be useful for this kind of problems.
+  less usual techniques, the data started to unfold. These are precisely our takeaways from this challenge: the different approaches we took upon getting stuck as well as how common knowledge can be useful for this kind of problems.
 
 We also learnt a lot about teamwork and coordination since it was our first hackaton.
