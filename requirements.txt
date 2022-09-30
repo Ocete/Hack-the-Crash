@@ -1,6 +1,6 @@
 future==0.18.0
 geoplotlib==0.3.2
-joblib==0.14.0
+joblib==1.2.0
 numpy==1.17.2
 pandas==0.25.1
 pyglet==1.4.5
